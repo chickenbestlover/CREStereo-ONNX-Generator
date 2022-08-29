@@ -75,7 +75,8 @@ class FullAttention(Module):
         A = torch.softmax(softmax_temp * QK, dim=2)
         if self.use_dropout:
             A = self.dropout(A)
-
-        queried_values = torch.einsum("nlsh,nshd->nlhd", A, values)
+            
+        T = torch.einsum("nlhd,nhdv->nlhv", Q, KV)
+        queried_values = torch.einsum("nlhv,nlh->nlhv", T, Z) * v_length
 
         return queried_values.contiguous()
